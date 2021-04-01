@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"git.jcu.edu.au/cft/cfds/crypt"
 	"git.jcu.edu.au/cft/cfds/datasources"
 	"gopkg.in/yaml.v2"
@@ -15,6 +16,7 @@ import (
 func main() {
 	seed := flag.String("seed", "", "Seed from seed.properties. 16 chars")
 	input := flag.String("input", "datasources.yml", "Input yaml data sources")
+	output := flag.String("output", "neo-datasource.xml", "Output XML file")
 	templateDir := "templates"
 	flag.Parse()
 	if *seed == "" || *input == "" {
@@ -24,14 +26,27 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer inFile.Close()
 	d := yaml.NewDecoder(inFile)
 	doc := datasources.NewDoc()
 	err = d.Decode(doc)
-	_ = inFile.Close()
-
-	templates := map[string]*template.Template{}
 	if err != nil {
 		panic("Error reading datasource file " + err.Error())
+	}
+
+	start := "<wddxPacket version='1.0'><header/><data><array length='2'><struct type='coldfusion.server.ConfigMap'>"
+	end := "</struct><struct type='coldfusion.server.ConfigMap'><var name='maxcachecount'><number>100.0</number></var></struct></array></data></wddxPacket>"
+
+	outFile, err := os.Create(*output)
+	if err != nil {
+		panic(err)
+	}
+	defer outFile.Close()
+
+	templates := map[string]*template.Template{}
+
+	if _, err = outFile.WriteString(start); err != nil {
+		panic(err)
 	}
 	for ds, data := range doc.Datasources {
 		data.Name = ds
@@ -52,11 +67,13 @@ func main() {
 				panic(err)
 			}
 		}
-		err = templates[key].Execute(os.Stdout, data)
+		err = templates[key].Execute(outFile, data)
 		if err != nil {
 			panic(err)
 		}
 	}
-
-	//tmpl := template.New("ds")
+	if _, err = outFile.WriteString(end); err != nil {
+		panic(err)
+	}
+	fmt.Printf("Wrote %d datasources\n", len(doc.Datasources))
 }
