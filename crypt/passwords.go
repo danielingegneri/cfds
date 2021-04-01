@@ -10,8 +10,8 @@ import (
 	"io"
 )
 
-func Encrypt(src string, key []byte) (string, error) {
-	block, err := aes.NewCipher(key)
+func Encrypt(src string, seed string) (string, error) {
+	block, err := aes.NewCipher([]byte(seed))
 	if err != nil {
 		return "", merry.Here(err)
 	}

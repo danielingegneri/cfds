@@ -1,0 +1,8 @@
+datasources:
+  testdb:
+    type: oracle
+    host: server.com
+    port: 9999
+    sid: db1
+    username: username
+    password: password

@@ -1,4 +1,4 @@
-<var name='{{name}}'>
+<var name='{{.Name}}'>
 	<struct type='coldfusion.server.ConfigMap'>
 		<var name='alter'>
 			<boolean value='true'/>
@@ -16,7 +16,7 @@
 			<string>macromedia.jdbc.MacromediaDriver</string>
 		</var>
 		<var name='url'>
-			<string>jdbc:macromedia:oracle://{{host}}:{{port}};SID={{sid}};AuthenticationMethod=userIDPassword;sendStringParametersAsUnicode=false;querytimeout=0;MaxPooledStatements=100;jdbcbehavior=0</string>
+			<string>jdbc:macromedia:oracle://{{.Host}}:{{.Port}};SID={{.Sid}};AuthenticationMethod=userIDPassword;sendStringParametersAsUnicode=false;querytimeout=0;MaxPooledStatements=100;jdbcbehavior=0</string>
 		</var>
 		<var name='drop'>
 			<boolean value='true'/>
@@ -50,7 +50,7 @@
 			<boolean value='true'/>
 		</var>
 		<var name='username'>
-			<string>{{username}}</string>
+			<string>{{.Username}}</string>
 		</var>
 		<var name='update'>
 			<boolean value='true'/>
@@ -86,7 +86,7 @@
 			<boolean value='true'/>
 		</var>
 		<var name='NAME'>
-			<string>{{name}}</string>
+			<string>{{.Name}}</string>
 		</var>
 		<var name='login_timeout'>
 			<number>30.0</number>
@@ -95,7 +95,7 @@
 			<boolean value='true'/>
 		</var>
 		<var name='password'>
-			<string>{{password}</string>
+			<string>{{.Password}}</string>
 		</var>
 		<var name='ISJ2EE'>
 			<boolean value='false'/>
@@ -115,7 +115,7 @@
 					<string/>
 				</var>
 				<var name='_port'>
-					<number>{{port}}.0</number>
+					<number>{{.Port}}.0</number>
 				</var>
 				<var name='args'>
 					<string/>
@@ -130,7 +130,7 @@
 					<string/>
 				</var>
 				<var name='host'>
-					<string>{{host}}</string>
+					<string>{{.Host}}</string>
 				</var>
 				<var name='selectMethod'>
 					<string>direct</string>
@@ -144,13 +144,13 @@
 				<var name='CONNECTIONPROPS'>
 					<struct>
 						<var name='PORT'>
-							<string>{{port}}</string>
+							<string>{{.Port}}</string>
 						</var>
 						<var name='SENDSTRINGPARAMETERSASUNICODE'>
 							<string>false</string>
 						</var>
 						<var name='HOST'>
-							<string>{{host}}</string>
+							<string>{{.Host}}</string>
 						</var>
 						<var name='MAXPOOLEDSTATEMENTS'>
 							<string>100</string>
@@ -159,7 +159,7 @@
 							<string>0</string>
 						</var>
 						<var name='SID'>
-							<string>{{sid}}</string>
+							<string>{{.Sid}}</string>
 						</var>
 					</struct>
 				</var>
@@ -182,7 +182,7 @@
 					<string/>
 				</var>
 				<var name='port'>
-					<string>{{port}}</string>
+					<string>{{.Port}}</string>
 				</var>
 				<var name='spyLogFile'>
 					<string/>
@@ -194,7 +194,7 @@
 					<string>0</string>
 				</var>
 				<var name='SID'>
-					<string>{{sid}}</string>
+					<string>{{.Sid}}</string>
 				</var>
 				<var name='database'>
 					<string/>
