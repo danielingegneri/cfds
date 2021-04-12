@@ -2,3 +2,5 @@
 cfds
 *.iml
 .idea
+datasources.yml
+neo-datasource.xml
