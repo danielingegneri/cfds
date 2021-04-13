@@ -26,7 +26,8 @@ func init() {
 }
 
 var generateCmd = &cobra.Command{
-	Use: "generate",
+	Use:   "generate",
+	Short: "Generates the neo-datasource.xml file that contains the Coldfusion datasources.",
 	Run: func(cmd *cobra.Command, args []string) {
 		generateXmlFile()
 	},
