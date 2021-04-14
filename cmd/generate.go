@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"git.jcu.edu.au/cft/cfds/crypt"
 	"git.jcu.edu.au/cft/cfds/datasources"
+	"github.com/ansel1/merry"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -28,12 +29,15 @@ func init() {
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generates the neo-datasource.xml file that contains the Coldfusion datasources.",
-	Run: func(cmd *cobra.Command, args []string) {
-		generateXmlFile()
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return generateXmlFile()
 	},
 }
 
-func generateXmlFile() {
+func generateXmlFile() error {
+	if seed == "" {
+		return merry.New("Requires seed parameter")
+	}
 	templateDir := "templates"
 	flag.Parse()
 	if seed == "" || input == "" {
@@ -41,14 +45,14 @@ func generateXmlFile() {
 	}
 	inFile, err := os.Open(input)
 	if err != nil {
-		panic(err)
+		return merry.Wrap(err)
 	}
 	defer inFile.Close()
 	d := yaml.NewDecoder(inFile)
 	doc := datasources.NewDoc()
 	err = d.Decode(doc)
 	if err != nil {
-		panic("Error reading datasource file " + err.Error())
+		return merry.New("Error reading datasource file").WithCause(err)
 	}
 
 	start := "<wddxPacket version='1.0'><header/><data><array length='2'><struct type='coldfusion.server.ConfigMap'>"
@@ -56,20 +60,20 @@ func generateXmlFile() {
 
 	outFile, err := os.Create(output)
 	if err != nil {
-		panic(err)
+		return merry.Wrap(err)
 	}
 	defer outFile.Close()
 
 	templates := map[string]*template.Template{}
 
 	if _, err = outFile.WriteString(start); err != nil {
-		panic(err)
+		return merry.Wrap(err)
 	}
 	for ds, data := range doc.Datasources {
 		data.Name = ds
 		data.Password, err = crypt.Encrypt(data.Password, seed)
 		if err != nil {
-			panic("Could not encrypt password")
+			return merry.New("Could not encrypt password").WithCause(err)
 		}
 		key := strings.ToLower(data.Type)
 		templateFile := filepath.Join(templateDir, key+".xml")
@@ -77,20 +81,21 @@ func generateXmlFile() {
 			// Load template
 			content, err := ioutil.ReadFile(templateFile)
 			if err != nil {
-				panic("Cannot load template " + templateFile)
+				return merry.New("Cannot load template " + templateFile).WithCause(err)
 			}
 			templates[key], err = template.New(key).Parse(string(content))
 			if err != nil {
-				panic(err)
+				return merry.Wrap(err)
 			}
 		}
 		err = templates[key].Execute(outFile, data)
 		if err != nil {
-			panic(err)
+			return merry.Wrap(err)
 		}
 	}
 	if _, err = outFile.WriteString(end); err != nil {
-		panic(err)
+		return merry.Wrap(err)
 	}
 	fmt.Printf("Wrote %d datasources\n", len(doc.Datasources))
+	return nil
 }
